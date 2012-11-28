@@ -118,12 +118,13 @@ module Ubiquo::UbiquoSettingsHelper
   def error_class ubiquo_setting
     ubiquo_setting.errors.present? ? " error_field" : " "
   end
+
   def text_setting_class ubiquo_setting
     classes = []
     classes << error_class(ubiquo_setting)
     if ubiquo_setting.options && ubiquo_setting.options[:tinymce]
       classes << Ubiquo::Config.context(:ubiquo_form_builder).get(:default_tag_options)[:text_area][:class]
     end
-    classes.join(' ').strip.squeeze
+    classes.join(' ').strip
   end
 end
