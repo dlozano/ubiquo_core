@@ -2,14 +2,7 @@ require File.dirname(__FILE__) + "/../../test_helper.rb"
 
 class Ubiquo::SettingsTest < ActiveSupport::TestCase
   include Ubiquo::Extensions::ConfigCaller
-
-  def setup
-    save_current_settings
-  end
-
-  def teardown
-    clear_settings
-  end
+  include SettingsTestHelper
 
   def test_add_new_option
     assert_nothing_raised do
@@ -578,22 +571,11 @@ class Ubiquo::SettingsTest < ActiveSupport::TestCase
     assert_equal [:foo_aa, :foo_b, :foo_ccc], Ubiquo::Settings.get_editable_settings.select{ |c| c.to_s.index('foo') == 0 }
   end
 
+  protected
+
   def dummy_method(options = {})
     options = {:word => "world"}.merge(options)
     "hello #{options[:word]}"
-  end
-
-  protected
-
-  def clear_settings
-    UbiquoSetting.delete_all
-    Ubiquo::Settings.settings[:ubiquo] = @old_configuration.clone
-    Ubiquo::Settings.settings.reject! { |k, v| !@initial_contexts.include?(k)}
-  end
-
-  def save_current_settings
-    @initial_contexts =  Ubiquo::Settings.settings.keys
-    @old_configuration = Ubiquo::Settings.settings[Ubiquo::Settings.default_context].clone
   end
 
 end

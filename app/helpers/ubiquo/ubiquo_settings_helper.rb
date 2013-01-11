@@ -74,16 +74,25 @@ module Ubiquo::UbiquoSettingsHelper
   end
 
   def render_template_type ubiquo_setting
+    result = nil
+    view_render_priority_hash(ubiquo_setting).detect do |view_path, rescue_from_error|
+      begin
+        result = render(view_path, :ubiquo_setting => ubiquo_setting)
+      rescue
+        raise $! unless rescue_from_error
+      end
+    end
+    result
+  end
+
+  def view_render_priority_hash(ubiquo_setting)
     type = ubiquo_setting.class.name.gsub('Setting', '').gsub('Ubiquo', '').underscore
     type = UbiquoSetting.name.underscore if type.blank?
-
-    result = render(:partial => "/ubiquo/ubiquo_settings/#{ubiquo_setting.context}/#{ubiquo_setting.key}",
-                        :locals => { :ubiquo_setting => ubiquo_setting }) rescue false
-    result = render(:partial => "/ubiquo/ubiquo_settings/#{type}",
-                        :locals => { :ubiquo_setting => ubiquo_setting })
-    result = render(:partial => "/ubiquo/ubiquo_settings/ubiquo_setting.html.erb",
-                      :locals => { :ubiquo_setting => ubiquo_setting }) if !result
-    result
+    ActiveSupport::OrderedHash[[
+      ["/ubiquo/ubiquo_settings/#{ubiquo_setting.context}/#{ubiquo_setting.key}", true],
+      ["/ubiquo/ubiquo_settings/#{type}"                                        , true],
+      ["/ubiquo/ubiquo_settings/ubiquo_setting"                                 , false]
+    ]]
   end
 
   def render_value ubiquo_setting

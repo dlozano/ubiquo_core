@@ -3,6 +3,8 @@ require File.dirname(__FILE__) + '/../../test_helper'
 class Ubiquo::UbiquoSettingsControllerTest < ActionController::TestCase
   use_ubiquo_fixtures
 
+  include Ubiquo::UbiquoSettingsHelper
+
   def setup
     save_current_settings
     enable_settings_override
